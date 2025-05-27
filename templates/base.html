@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Intelbras{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block extra_css %}
+        <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/pato_favicon.png') }}">    
+    {% endblock %}
+</head>
+<body>
+    <header>
+        {% block header %}
+        <div class="header-container">
+            <a href="{{ url_for('home') }}" class="link-home">
+                <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Logo Intelbras" class="logo-img">
+                <div class="pato-hover-container">
+                    <img src="{{ url_for('static', filename='img/pato.png') }}" alt="Pato" class="logo-pato-img normal">
+                    <img src="{{ url_for('static', filename='img/pato_quack.png') }}" alt="Pato Quack" class="logo-pato-img quack">
+                </div>
+            </a>
+            <h2 class="header-title">Portal Ágil de Tecnologias Operacionais</h2>
+        </div>
+        {% endblock %}
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+        <div style="height: 100px;"></div>
+    </main>
+
+    <footer>
+        <p id="copyright">© 2025 Intelbras. Todos os direitos reservados.</p>
+        <p id="versao">Versão 1.0.0</p>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+    </body>
+</html>

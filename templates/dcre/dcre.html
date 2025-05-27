@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}DCRE Tool - Intelbras{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='DCRE_style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/DCRE_icon.png') }}">
+{% endblock %}
+
+{% block header %}
+    <div class="header-container">
+        <a href="{{ url_for('home') }}" class="link-home">
+            <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Logo Intelbras" class="logo-img">
+            <div class="pato-hover-container">
+                <img src="{{ url_for('static', filename='img/pato.png') }}" alt="Pato" class="logo-pato-img normal">
+                <img src="{{ url_for('static', filename='img/pato_quack.png') }}" alt="Pato Quack" class="logo-pato-img quack">
+            </div>
+        </a>
+        <nav class="nav-links">
+            <a href="{{ url_for('ncm.ncm_home') }}" class="link-home">NCM</a>
+            <a href="{{ url_for('manueldex.manueldex_home') }}">Manuel Dex</a>
+            <a href="{{ url_for('easyckd.easyCKD_home') }}" class="link-home">EasyCKD</a>
+            <a href="{{ url_for('datasheetos.datasheetos_home') }}" class="link-home">Datasheetos</a>
+        </nav>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="dcre-content">
+        <div class="cabeca">
+            <h1>DCRE Tool</h1>
+            <h2>Ferramenta para geração de DCRE através da estrutura do produto.</h2>
+            <div class="alert-box">
+                <p>⚠️ <strong>Atenção:</strong> Usar a LT exportada do <strong>CS12</strong> no <strong>modo padrão!</strong> ⚠️</p>
+            </div>
+            <h5> Para saber mais detalhes acesse o <a href="https://intelbras.atlassian.net/wiki/x/AgCXWw" target="_blank" rel="external">tutorial no Confluence</a>.</h5>
+        </div>
+        <form method="POST" enctype="multipart/form-data" action="{{ url_for('dcre.DCRE_Tool') }}">
+            <label for="excel_file">Selecione a estrutura do produto:</label>
+            <input type="file" name="excel_file" accept=".xlsx">
+            <label for="model">Modelo:</label>
+            <input type="text" name="model" id="Modelo">
+            <label for="ncm">NCM do produto:</label>
+            <input type="text" name="ncm" id="NCM" oninput="formatNCM(this)" maxlength="10">
+            <label for="price">Preço de venda (US$):</label>
+            <input type="text" name="price" id="Preco" oninput="this.value = this.value.replace(/[^0-9.,]/g, '');">
+            <label for="weight">Peso (kg):</label>
+            <input type="text" name="weight" id="Peso" oninput="this.value = this.value.replace(/[^0-9.,]/g, '');">
+            <input type="submit" value="Gerar DCRE">
+        </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function formatNCM(input) {
+            var inputElement = document.getElementById("NCM");
+            var ncm = inputElement.value.replace(/\D/g, ''); // Remove caracteres não numéricos
+
+            // Aplica a formatação do NCM (XXXX.XX.XX)
+            if (ncm.length >= 4) {
+                ncm = ncm.substr(0, 4) + '.' + ncm.substr(4);
+            }
+            if (ncm.length >= 7) {
+                ncm = ncm.substr(0, 7) + '.' + ncm.substr(7);
+            }
+
+            // Define o valor formatado no campo de entrada
+            inputElement.value = ncm;
+        }
+    </script>
+{% endblock %}

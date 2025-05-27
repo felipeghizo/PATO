@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Datasheetos - Intelbras{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='DataSheetos_style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/Datasheetos_icon.png') }}">
+{% endblock %}
+
+{% block header %}
+    <div class="header-container">
+        <a href="{{ url_for('home') }}" class="link-home">
+            <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Logo Intelbras" class="logo-img">
+            <div class="pato-hover-container">
+                <img src="{{ url_for('static', filename='img/pato.png') }}" alt="Pato" class="logo-pato-img normal">
+                <img src="{{ url_for('static', filename='img/pato_quack.png') }}" alt="Pato Quack" class="logo-pato-img quack">
+            </div>
+        </a>
+        <nav class="nav-links">
+            <a href="{{ url_for('dcre.dcre_home') }}" class="link-home">DCRE</a>
+            <a href="{{ url_for('ncm.ncm_home') }}" class="link-home">NCM</a>
+            <a href="{{ url_for('datasheetos.datasheetos_home') }}" class="link-home">Datasheetos</a>
+            <a href="{{ url_for('easyckd.easyCKD_home') }}" class="link-home">EasyCKD</a>
+        </nav>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <h2 class="titulo">Gerar Datasheet</h2>
+    <div class="alert-box">
+        <p>⚠️ <strong>EM OBRAS</strong> ⚠️</p>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,125 @@
+main{
+    background-color: #f4f4f4;
+}
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 20px;
+}
+
+form {
+    width: 80%;
+    max-width: 600px;
+    margin: 20px auto; /* Margem superior adicionada para mover o contêiner para baixo */
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+main h2 {
+    text-align: center; /* Centraliza o texto horizontalmente */
+    margin-bottom: 10px; /* Centraliza o elemento na largura da div/section */
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="file"],
+input[type="text"] {
+    width: 96%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+input[type="submit"] {
+    background-color: #4CAF50; /* Cor verde */
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #45a049; /* Cor verde mais escura ao passar o mouse */
+}
+
+.alert-box {
+    width: 35%;
+    margin: auto;
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 16px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+.alert-box p{
+    margin: auto;
+}
+
+@media screen and (max-width: 1275px) {
+    div.dcre-content{background-color: #f4f4f4; height: 100%;}
+    h1{
+        margin: 10px;
+    }
+    form{
+        position: relative;
+        float: right;
+        right: 25%;
+        width: 75%;
+        height: calc(100% - 20px);
+    }
+    .cabeca{
+        position: relative;
+        float: left;
+        width: 20%;
+        height: 97%;
+        margin: 1%;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .cabeca p{
+        text-align: left;
+        margin: 2% 10%;
+    }
+    main h2 {
+        text-align: left; /* Centraliza o texto horizontalmente */
+        font-size: 18px;
+        margin: 5px 6px; /* Centraliza o elemento na largura da div/section */
+    }
+    .dcre-content form{
+        height: 90%;
+        position: relative;
+        top: 30px;
+    }
+    .alert-box {
+        position: absolute;
+        width: 520px;
+        top: -15px;
+        left: 390px;
+        height: 25px;
+    }
+    .alert-box p{
+        position: relative;
+        margin: auto;
+        top: -10px;
+    }
+}

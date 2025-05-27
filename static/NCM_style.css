@@ -1,0 +1,282 @@
+/* Estrutura reorganizada seguindo a ordem do HTML com hierarquia explícita */
+
+.ncm-content {
+    height: 100%;
+}
+.ncm-content h2{
+    margin-bottom: 10px;
+}
+.ncm-content h5{
+    margin-bottom: 30px;
+}
+
+.ncm-content .txtprin {
+    padding: 1%;
+}
+
+.ncm-content .center {
+    text-align: center;
+    height: 90%;
+}
+
+.ncm-content .center .tab-buttons {
+    display: flex;
+    justify-content: center;
+}
+
+.ncm-content .center .tab-buttons .tab-btn {
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    background: #eaeaea;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border-radius: 10px 10px 0 0;
+    margin: 0 5px;
+}
+
+.ncm-content .center .tab-buttons .tab-btn.active {
+    background-color: #4CAF50;
+    color: white;
+    border-bottom: none;
+    box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.ncm-content .center form {
+    display: block;
+    text-align: left;
+    background: #f4f4f4;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    width: 40%;
+    margin: 0 auto;
+}
+
+.ncm-content .center form .form-group {
+    margin-bottom: 15px;
+}
+
+.ncm-content .center form .form-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.ncm-content .center form .form-group .subtitulo {
+    font-size: 14px;
+    color: #888;
+    font-weight: normal;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.ncm-content .center form .form-group input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.ncm-content .center form .form-group textarea {
+    max-width: 100%;
+    min-width: 60px;
+    max-height: 400px;
+    min-height: 60px;
+    overflow-y: auto;
+    display: block;
+    margin: 0 auto; 
+}
+
+.ncm-content .center form .form-group .dropdown-btn {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+}
+
+.ncm-content .center form .form-group .dropdown-btn span {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.ncm-content .center form .form-group .dropdown-content {
+    display: none;
+    position: absolute;
+    width: 220px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 12px;
+    z-index: 1000;
+    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.12);
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 14px;
+}
+
+.ncm-content .center form .form-group .dropdown-content label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+}
+
+.ncm-content .center form .form-group .dropdown-content label:hover {
+    background-color: #f0f0f0;
+}
+
+.ncm-content .center form .form-group .dropdown-content label p {
+    margin: 0;
+    flex: 1;
+    font-weight: 500;
+}
+
+.ncm-content .center form .form-group .dropdown-content .dropdown-ok {
+    display: block;
+    width: 100%;
+    padding: 8px 0;
+    margin-top: 12px;
+    background: #4CAF50;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.ncm-content .center form .form-group .dropdown-content .dropdown-ok:hover {
+    background: #1b5e20;
+}
+
+.ncm-content .center form .send {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.ncm-content .center form .send input[type="submit"] {
+    padding: 10px 20px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.ncm-content .center form .send input[type="submit"]:hover {
+    background: #45a049;
+}
+
+.ncm-content .center table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.ncm-content .center table th,
+.ncm-content .center table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+.ncm-content .center table th {
+    background: #4CAF50;
+    color: white;
+}
+
+.ncm-content .center table tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+.ncm-content .center .error-box {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    background: #ff6b6b;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.ncm-content .center .error-box button {
+    background: transparent;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.fade {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.hidden-form {
+    display: none;
+}
+
+.form-tab {
+    display: block;
+}
+
+.d-none {
+    display: none !important;
+}
+
+.alert-box {
+    width: 100%;
+    margin: auto;
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 16px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+.alert-box p{
+    margin: auto;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media screen and (max-width: 1275px) {
+    .txtprin{
+        padding: 5px !important;
+    }
+    .ncm-content h2{
+        margin-bottom: 4px;
+    }
+    .ncm-content h5{
+        margin-bottom: 10px;
+    }
+    
+}

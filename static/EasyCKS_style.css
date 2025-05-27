@@ -1,0 +1,239 @@
+.easyckd-container {
+    display: flex;
+    min-height: 80vh;
+    margin-top: 20px;
+    gap: 20px;
+}
+
+.sidebar {
+    width: 250px;
+    padding: 20px;
+    background-color: #f2f2f2;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.main-panel {
+    flex: 1;
+    padding: 20px;
+    background-color: #e9e9e9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.version-control {
+    margin-bottom: 20px;
+}
+
+.input-large {
+    width: 60%;
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.global-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.version-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.version-card {
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    min-width: 250px;
+}
+
+.version-card h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.version-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.file-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.file-control span {
+    font-size: 0.9em;
+    color: #555;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 120px;
+}
+
+.btn {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #45a049;
+}
+
+.btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.small-btn {
+    padding: 6px 12px;
+    font-size: 0.8em;
+}
+
+#resetBtn{
+    background-color: rgb(252, 85, 85);
+}
+#resetBtn:hover{
+    background-color: rgb(212, 48, 48);
+}
+
+.output-box {
+    height: 300px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.output-textarea {
+    width: 100%;
+    height: 100%;
+    resize: none;
+    border: none;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 0.9em;
+    background-color: #f8f8f8;
+}
+
+.output-textarea:focus {
+    outline: none;
+}
+
+.bom-form {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    font-family: sans-serif;
+}
+
+.form-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-bottom: 0.5rem;
+}
+
+.form-input {
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    background-color: #f9fafb;
+    color: #111827;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.form-input:hover {
+    background-color: #f3f4f6;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    background-color: #fff;
+}
+
+.form-status {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-style: italic;
+    margin-top: 0.5rem;
+}
+
+.form-button {
+    margin-top: 1rem;
+    width: 100%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.form-button:hover {
+    background-color: #45a049;
+}
+.hidden-file-input {
+    display: none;
+}
+
+.file-upload-button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    color: #fff;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+    white-space: nowrap;
+}
+
+.file-upload-button:hover {
+    background-color: #45a049;
+}
+
+@media screen and (max-width: 1275px) {
+    .input-large {
+        width: 50%;
+    }
+}

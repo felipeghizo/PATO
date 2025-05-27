@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}PATO Intelbras{% endblock %}
+
+{% block content %}
+    <div class="cards">
+        <a href="{{ url_for('dcre.dcre_home') }}" class="card">
+            <div class="icone"><img src="../static/img/DCRE_icon.png"/></div>
+            <h2>DCRE Tool</h2>
+            <p>Monte o arquivo DCRE para o seu produto...</p>
+        </a>
+        <a href="{{ url_for('ncm.ncm_home') }}" class="card">
+            <div class="icone"><img src="../static/img/NCM_icon.png"/></div>
+            <h2>NCM Finder</h2>
+            <p>Procurando por um NCM para seu componente...</p>
+        </a>
+        <a href="{{ url_for('manueldex.manueldex_home') }}" class="card">
+            <div class="icone"><img src="../static/img/Manueldex_icon.png"/></div>
+            <h2>Manueldex</h2>
+            <P>Monte o seu manual com poucos cliques.</P>
+        </a>
+        <a href="{{ url_for('easyckd.easyCKD_home') }}" class="card">
+            <div class="icone"><img src="../static/img/EasyCKD_icon.png"/></div>
+            <h2>Easy CKD</h2>
+            <P>Confira se a BOM está compativél com seu gerber e já monte sua LT de forma automática.</P>
+        </a>
+        <a href="{{ url_for('datasheetos.datasheetos_home') }}" class="card">
+            <div class="icone"><img src="../static/img/Datasheetos_icon.png"/></div>
+            <h2>Data sheetos</h2>
+            <P>Monte o data sheetos.</P>
+        </a>
+    </div>
+{% endblock %}

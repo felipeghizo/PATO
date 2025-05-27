@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}Datasheetos - Intelbras{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='DataSheetos_style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/Datasheetos_icon.png') }}">
+{% endblock %}
+
+{% block header %}
+    <div class="header-container">
+        <a href="{{ url_for('home') }}" class="link-home">
+            <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Logo Intelbras" class="logo-img">
+            <div class="pato-hover-container">
+                <img src="{{ url_for('static', filename='img/pato.png') }}" alt="Pato" class="logo-pato-img normal">
+                <img src="{{ url_for('static', filename='img/pato_quack.png') }}" alt="Pato Quack" class="logo-pato-img quack">
+            </div>
+        </a>
+        <nav class="nav-links">
+            <a href="{{ url_for('dcre.dcre_home') }}" class="link-home">DCRE</a>
+            <a href="{{ url_for('ncm.ncm_home') }}" class="link-home">NCM</a>
+            <a href="{{ url_for('manueldex.manueldex_home') }}">Manuel Dex</a>
+            <a href="{{ url_for('easyckd.easyCKD_home') }}" class="link-home">EasyCKD</a>
+        </nav>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+<h2 class="titulo">Gerar Datasheet</h2>
+<div class="alert-box">
+    <p>⚠️ <strong>EM OBRAS</strong> ⚠️</p>
+</div>
+
+<form method="POST" enctype="multipart/form-data" action="{{ url_for('datasheetos.generate_datasheet') }}">    <div class="datasheet-wrapper">
+        <!-- Linha nomes -->
+        <div class="linha linha-nomes">
+            <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Logo Intelbras" class="logo-img">
+            <input type="text" name="nome_bullet" placeholder="NOME BULLET">
+            <input type="text" name="nome_dome" placeholder="NOME DOME">
+        </div>
+
+        <!-- Linha combinando fotos e características lado a lado -->
+        <div class="linha linha-fotos-caracteristicas">
+            <!-- Fotos -->
+            <div class="box-fotos">
+                <div class="foto" id="dropZone_bullet">
+                    <label>Foto Bullet</label>
+                    <input type="file" name="foto_bullet" id="file_bullet" style="display:none" accept="image/*" onchange="handleFileChange(event)">
+                    <button type="button" onclick="document.getElementById('file_bullet').click()">Escolher arquivo</button>
+                    <div class="preview">
+                        <img id="preview_bullet" src="" alt="Pré-visualização" style="max-width: 100px; display:none; margin-top: 10px;">
+                    </div>
+                    <button type="button" id="remove_bullet" style="display:none; margin-top:10px;" onclick="removeFile('file_bullet')">Remover arquivo</button>
+                </div>
+
+                <div class="foto" id="dropZone_dome">
+                    <label>Foto Dome</label>
+                    <input type="file" name="foto_dome" id="file_dome" style="display:none" accept="image/*" onchange="handleFileChange(event)">
+                    <button type="button" onclick="document.getElementById('file_dome').click()">Escolher arquivo</button>
+                    <div class="preview">
+                        <img id="preview_dome" src="" alt="Pré-visualização" style="max-width: 100px; display:none; margin-top: 10px;">
+                    </div>
+                    <button type="button" id="remove_dome" style="display:none; margin-top:10px;" onclick="removeFile('file_dome')">Remover arquivo</button>
+                </div>
+            </div>
+
+            <!-- Características -->
+            <div class="box-caracteristicas">
+                <h2>Câmera IP</h2>
+                <input type="text" name="caracteristica_1" placeholder="Característica 1">
+                <input type="text" name="caracteristica_2" placeholder="Característica 2">
+                <input type="text" name="caracteristica_3" placeholder="Característica 3">
+                <input type="text" name="caracteristica_4" placeholder="Característica 4">
+                <input type="text" name="caracteristica_5" placeholder="Característica 5">
+            </div>
+        </div>
+
+        <!-- Linha selos -->
+        <div class="linha linha-selos">
+            {% for i in range(1, 6) %}
+                <div class="foto_selo" id="dropZone_selo_{{ i }}">
+                    <label>Selo {{ i }}</label>
+                    <input type="file" name="selo_{{ i }}" id="file_selo_{{ i }}" style="display:none" accept="image/*" onchange="handleFileChange(event)">
+                    <button type="button" onclick="document.getElementById('file_selo_{{ i }}').click()">Escolher arquivo</button>
+                    <div class="preview">
+                        <img id="preview_selo_{{ i }}" src="" alt="Pré-visualização" style="max-width: 50px; display:none; margin-top: 10px;">
+                    </div>
+                    <button type="button" id="remove_selo_{{ i }}" style="display:none; margin-top:10px;" onclick="removeFile('file_selo_{{ i }}')">Remover arquivo</button>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Linha botão e datasheet -->
+        <div class="linha linha-datasheet">
+            <div class="foto" id="dropZone_dahua">
+                <label>Datasheet Dahua</label>
+                <input type="file" name="dahua_pdf" id="file_Datasheet_Dahua" style="display:none" onchange="handleFileChange(event)">
+                <button type="button" onclick="document.getElementById('file_Datasheet_Dahua').click()">Escolher arquivo</button>
+                <div class="preview">
+                    <img id="preview_Datasheet_Dahua" src="" alt="Pré-visualização" style="max-width: 100px; display:none; margin-top: 10px;">
+                </div>
+                <button type="button" id="remove_Datasheet_Dahua" style="display:none; margin-top:10px;" onclick="removeFile('file_Datasheet_Dahua')">Remover arquivo</button>
+            </div>
+            <button type="submit">Gerar datasheet</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Ativar drag and drop
+    document.querySelectorAll('.foto, .foto_selo').forEach((dropZone) => {
+        const input = dropZone.querySelector('input[type="file"]');
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                input.files = files;
+                const event = new Event('change', { bubbles: true });
+                input.dispatchEvent(event);
+            }
+        });
+    });
+
+    // Função para verificar se há selos preenchidos
+    function checkSelosPreenchidos() {
+        const linhaSelos = document.querySelector('.linha-selos');
+        const selosInputs = document.querySelectorAll('.foto_selo input[type="file"]');
+        let hasFiles = false;
+        
+        selosInputs.forEach(input => {
+            if (input.files && input.files.length > 0) {
+                hasFiles = true;
+            }
+        });
+        
+        if (hasFiles) {
+            linhaSelos.style.height = '130px';
+            linhaSelos.classList.add('com-selos');
+        } else {
+            linhaSelos.style.height = '95px';
+            linhaSelos.classList.remove('com-selos');
+        }
+    }
+
+    // Pré-visualizar imagem e mostrar botão remover
+    function handleFileChange(event) {
+        const input = event.target;
+        const id = input.id.replace('file_', '');
+        const previewImg = document.getElementById('preview_' + id);
+        const removeBtn = document.getElementById('remove_' + id);
+        const previewBox = input.closest('.foto, .foto_selo')?.querySelector('div.preview');
+        
+        if (input.files.length > 0) {
+            const file = input.files[0];
+            if (previewImg) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImg.src = e.target.result;
+                    previewImg.style.display = 'block';
+                    if(previewBox) previewBox.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+
+            if (removeBtn) removeBtn.style.display = 'inline-block';
+        } else {
+            if (previewImg) {
+                previewImg.src = '';
+                previewImg.style.display = 'none';
+            }
+            if (previewBox) previewBox.style.display = 'none';
+            if (removeBtn) removeBtn.style.display = 'none';
+        }
+        
+        // Verificar selos após mudança
+        if (input.closest('.foto_selo')) {
+            checkSelosPreenchidos();
+        }
+    }
+
+    // Remover imagem e esconder preview
+    function removeFile(inputId) {
+        const input = document.getElementById(inputId);
+        const previewBox = input.closest('.foto, .foto_selo')?.querySelector('div.preview');
+
+        input.value = '';
+
+        const id = inputId.replace('file_', '');
+        const previewImg = document.getElementById('preview_' + id);
+        const removeBtn = document.getElementById('remove_' + id);
+        
+        if(previewBox) previewBox.style.display = 'none';
+        if (previewImg) {
+            previewImg.src = '';
+            previewImg.style.display = 'none';
+        }
+        if (removeBtn) removeBtn.style.display = 'none';
+        
+        // Verificar selos após remoção
+        if (input.closest('.foto_selo')) {
+            checkSelosPreenchidos();
+        }
+    }
+
+    // Inicializar verificação
+    document.addEventListener('DOMContentLoaded', checkSelosPreenchidos);
+</script>
+{% endblock %}

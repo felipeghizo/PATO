@@ -1,0 +1,396 @@
+{% extends "base.html" %}
+
+{% block title %}EasyCKD - Intelbras{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='EasyCKS_style.css') }}">
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='img/EasyCKD_icon.png') }}">
+{% endblock %}
+
+{% block header %}
+    <div class="header-container">
+        <a href="{{ url_for('home') }}" class="link-home">
+            <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Logo Intelbras" class="logo-img">
+            <div class="pato-hover-container">
+                <img src="{{ url_for('static', filename='img/pato.png') }}" alt="Pato" class="logo-pato-img normal">
+                <img src="{{ url_for('static', filename='img/pato_quack.png') }}" alt="Pato Quack" class="logo-pato-img quack">
+            </div>
+        </a>
+        <nav class="nav-links">
+            <a href="{{ url_for('dcre.dcre_home') }}" class="link-home">DCRE</a>
+            <a href="{{ url_for('ncm.ncm_home') }}" class="link-home">NCM</a>
+            <a href="{{ url_for('manueldex.manueldex_home') }}">Manuel Dex</a>
+            <a href="{{ url_for('datasheetos.datasheetos_home') }}" class="link-home">Datasheetos</a>
+        </nav>
+    </div>
+{% endblock %}
+
+{% block content %}
+<h1 class="txtprin">Easy CKD</h1>
+<h5> Para saber mais detalhes acesse o <a href="https://intelbras.atlassian.net/wiki/x/AYCbWw" target="_blank" rel="external">tutorial no Confluence</a>.</h5>
+
+<div class="easyckd-container">
+    <div class="sidebar">
+        <h3>Bill of Materials</h3>
+        <form id="bomForm" action="/easyckd/upload_bom" method="POST" enctype="multipart/form-data" class="bom-form">
+            <h2 class="form-title">Carregar<br>Arquivo BOM</h2>
+        
+            <label class="form-label">Arquivo BOM (.xlsx ou .csv):</label>
+            
+            <!-- Botão customizado -->
+            <label for="bom_file" class="file-upload-button">Escolher Arquivo</label>
+            <input type="file" name="bom_file" id="bom_file" required class="hidden-file-input">
+        
+            <p id="bomStatus" class="form-status">Nenhuma BOM carregada</p>
+            
+            <button type="submit" class="form-button">Carregar</button>
+        </form>                
+    </div>
+    <div class="main-panel">
+        <div class="version-control">
+            <label for="versions">Versões da placa (separadas por vírgula):</label>
+            <input type="text" id="versions" name="versions" class="input-large">
+            <button type="button" class="btn" id="updateVersions">Atualizar</button>
+        </div>
+
+        <div id="versionCards" class="version-cards"></div>
+
+        <div class="global-actions">
+            <button type="button" class="btn" id="compareBtn" disabled>Comparar</button>
+            <button type="button" class="btn" id="exportExcelBtn" disabled>Exportar Excel</button>
+            <button type="button" class="btn" id="exportPdfBtn" disabled>Exportar PDF</button>
+            <button type="button" class="btn" id="exportSapBtn" disabled>Exportar SAP</button>
+            <button type="button" class="btn" id="resetBtn">Reset Geral</button>
+        </div>
+
+        <div class="output-box">
+            <textarea readonly class="output-textarea" id="outputText" placeholder="Resultados aparecerão aqui..."></textarea>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const output = document.getElementById("outputText");
+    const bomForm = document.getElementById("bomForm");
+    const bomStatus = document.getElementById("bomStatus");
+    const updateVersionsBtn = document.getElementById("updateVersions");
+    const versionsInput = document.getElementById("versions");
+    const versionCards = document.getElementById("versionCards");
+    const compareBtn = document.getElementById("compareBtn");
+    const exportExcelBtn = document.getElementById("exportExcelBtn");
+    const exportPdfBtn = document.getElementById("exportPdfBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const exportSapBtn = document.getElementById("exportSapBtn");
+
+    let versions = [];
+    let bomLoaded = false;
+    let xmlFiles = {};
+    let pdfFiles = {};
+    let resultsAvailable = false;
+
+    function log(message) {
+        const now = new Date().toLocaleTimeString();
+        output.value += `[${now}] ${message}\n`;
+        output.scrollTop = output.scrollHeight;
+    }
+
+    function updateButtons() {
+        compareBtn.disabled = !(bomLoaded && Object.keys(xmlFiles).length > 0);
+        exportExcelBtn.disabled = !resultsAvailable;
+        exportPdfBtn.disabled = !(resultsAvailable && Object.keys(pdfFiles).length > 0);
+        exportSapBtn.disabled = !resultsAvailable;
+    }
+
+    function createVersionCard(version) {
+        const card = document.createElement('div');
+        card.className = 'version-card';
+        card.innerHTML = `
+            <h4>${version}</h4>
+            <div class="version-controls">
+                <div class="file-control">
+                    <input type="file" id="xml_${version}" name="xml_file" accept=".xml" style="display: none;">
+                    <button type="button" class="btn small-btn" onclick="document.getElementById('xml_${version}').click()">Carregar XML</button>
+                    <span id="xmlStatus_${version}">Nenhum XML</span>
+                </div>
+                <div class="file-control">
+                    <input type="file" id="pdf_${version}" name="pdf_file" accept=".pdf" style="display: none;">
+                    <button type="button" class="btn small-btn" onclick="document.getElementById('pdf_${version}').click()">Carregar PDF</button>
+                    <span id="pdfStatus_${version}">Nenhum PDF</span>
+                </div>
+            </div>
+        `;
+        versionCards.appendChild(card);
+
+        document.getElementById(`xml_${version}`).addEventListener('change', function(e) {
+            uploadFile(e.target.files[0], 'xml', version);
+        });
+
+        document.getElementById(`pdf_${version}`).addEventListener('change', function(e) {
+            uploadFile(e.target.files[0], 'pdf', version);
+        });
+    }
+
+    function uploadFile(file, type, version) {
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append(`${type}_file`, file);
+        formData.append('version', version);
+
+        // Update endpoint to include blueprint prefix
+        const endpoint = `/easyckd/upload_${type}`;
+
+        fetch(endpoint, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'  // Explicitly request JSON
+            }
+        })
+        .then(response => {
+            // First check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                return response.text().then(text => {
+                    throw new Error(`Resposta inesperada do servidor: ${text.substring(0, 100)}...`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                log(data.message);
+                if (type === 'xml') {
+                    xmlFiles[version] = file.name;
+                    document.getElementById(`xmlStatus_${version}`).textContent = 
+                        file.name.length > 15 ? file.name.substring(0, 15) + '...' : file.name;
+                } else {
+                    pdfFiles[version] = file.name;
+                    document.getElementById(`pdfStatus_${version}`).textContent = 
+                        file.name.length > 15 ? file.name.substring(0, 15) + '...' : file.name;
+                }
+                updateButtons();
+            } else {
+                log(`Erro: ${data.message}`);
+            }
+        })
+        .catch(error => {
+            log(`Erro ao carregar arquivo ${type.toUpperCase()}: ${error.message}`);
+        });
+    }
+
+    bomForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(bomForm);
+        
+        // Update this URL to match your blueprint URL prefix
+        fetch('/easyckd/upload_bom', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(`HTTP error! status: ${response.status} - ${text.substring(0, 100)}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                log(data.message);
+                bomStatus.textContent = formData.get('bom_file').name;
+                bomLoaded = true;
+                
+                versionCards.innerHTML = '';
+                data.versions.forEach(version => {
+                    createVersionCard(version);
+                });
+                
+                updateButtons();
+            } else {
+                log(`Erro: ${data.message || 'Erro desconhecido ao processar BOM'}`);
+                bomStatus.textContent = "Erro ao carregar";
+                bomStatus.style.color = "red";
+                setTimeout(() => {
+                    bomStatus.style.color = "";
+                }, 3000);
+            }
+        })
+        .catch(error => {
+            log(`Erro ao carregar BOM: ${error.message}`);
+            bomStatus.textContent = "Erro ao carregar";
+            bomStatus.style.color = "red";
+            setTimeout(() => {
+                bomStatus.style.color = "";
+            }, 3000);
+        });
+    });
+
+    updateVersionsBtn.addEventListener('click', function() {
+        const versionsText = versionsInput.value;
+        if (!versionsText.trim()) {
+            log("Nenhuma versão inserida.");
+            return;
+        }
+
+        versions = versionsText.split(',').map(v => v.trim()).filter(v => v);
+        versionCards.innerHTML = '';
+        versions.forEach(version => {
+            createVersionCard(version);
+        });
+        log(`Versões atualizadas: ${versions.join(', ')}`);
+    });
+
+    function performComparison() {
+        fetch('/easyckd/compare', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            // First check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                return response.text().then(text => {
+                    throw new Error(`Resposta inesperada: ${text.substring(0, 100)}...`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                log(data.message);
+                resultsAvailable = true;
+                updateButtons();
+                
+                // Enable PDF export if PDF was uploaded
+                if (Object.keys(pdfFiles).length > 0) {
+                    exportPdfBtn.disabled = false;
+                }
+            } else {
+                log(`Erro: ${data.message}`);
+            }
+        })
+        .catch(error => {
+            log(`Erro ao comparar: ${error.message}`);
+        });
+    }
+
+// Update your compare button event listener
+compareBtn.addEventListener('click', performComparison);
+
+    // Export Excel
+exportExcelBtn.addEventListener('click', function() {
+    fetch('/easyckd/export_excel', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok && response.headers.get('content-type')?.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
+            return response.blob().then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Relatorio_EasyCKD_${new Date().toISOString().slice(0, 10)}.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+                log("Relatório Excel exportado com sucesso!");
+            });
+        }
+        return response.json().then(data => {
+            throw new Error(data.message || 'Erro ao exportar Excel');
+        });
+    })
+    .catch(error => {
+        log(`Erro ao exportar Excel: ${error.message}`);
+    });
+});
+
+// Export PDF
+exportPdfBtn.addEventListener('click', function() {
+    const version = Object.keys(pdfFiles)[0]; // Pega a primeira versão disponível
+    if (!version) return;
+
+    const formData = new FormData();
+    formData.append('version', version);
+
+    fetch('/easyckd/export_pdf', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok && response.headers.get('content-type')?.includes('application/pdf')) {
+            return response.blob().then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${version}_marked.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+                log("PDF marcado exportado com sucesso!");
+            });
+        }
+        return response.json().then(data => {
+            throw new Error(data.message || 'Erro ao exportar PDF');
+        });
+    })
+    .catch(error => {
+        log(`Erro ao exportar PDF: ${error.message}`);
+    });
+});
+
+    resetBtn.addEventListener('click', function() {
+        window.location.reload();
+    });
+
+    exportSapBtn.addEventListener('click', function() {
+        fetch('/easyckd/export_sap', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok && response.headers.get('content-type')?.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
+                return response.blob().then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Relatorio_SAP_${new Date().toISOString().slice(0, 10)}.xlsx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    a.remove();
+                    log("Relatório SAP exportado com sucesso!");
+                });
+            }
+            return response.json().then(data => {
+                throw new Error(data.message || 'Erro ao exportar SAP');
+            });
+        })
+        .catch(error => {
+            log(`Erro ao exportar SAP: ${error.message}`);
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}NCM Finder - Intelbras{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='NCM_style.css') }}">
+<link rel="icon" type="image/png" href="{{ url_for('static', filename='img/NCM_icon.png') }}">
+{% endblock %}
+
+{% block header %}
+    <div class="header-container">
+        <a href="{{ url_for('home') }}" class="link-home">
+            <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Logo Intelbras" class="logo-img">
+            <div class="pato-hover-container">
+                <img src="{{ url_for('static', filename='img/pato.png') }}" alt="Pato" class="logo-pato-img normal">
+                <img src="{{ url_for('static', filename='img/pato_quack.png') }}" alt="Pato Quack" class="logo-pato-img quack">
+            </div>
+        </a>
+        <nav class="nav-links">
+            <a href="{{ url_for('dcre.dcre_home') }}">DCRE</a>
+            <a href="{{ url_for('manueldex.manueldex_home') }}">Manuel Dex</a>
+            <a href="{{ url_for('easyckd.easyCKD_home') }}">EasyCKD</a>
+            <a href="{{ url_for('datasheetos.datasheetos_home') }}">Datasheetos</a>
+        </nav>
+    </div>
+{% endblock %}
+
+{% block content %} 
+<div class="ncm-content">
+    <h1 class="txtprin">NCM Finder</h1>
+    <div class="center">
+        <h2>Encontre o NCM através de palavras chaves ou dos códigos dos componentes.</h2>
+        <h5> Para saber mais detalhes acesse o <a href="https://intelbras.atlassian.net/wiki/x/AYCZWw" target="_blank" rel="external">tutorial no Confluence</a>.</h5>
+
+        <!-- Botões de Alternância -->
+        <div class="tab-buttons">
+            <button type="button" id="btnPalavras" class="tab-btn {% if active_tab != 'codigos' %}active{% endif %}" onclick="mostrarPalavras()">Busca por palavra chave</button>
+            <button type="button" id="btnCodigos" class="tab-btn {% if active_tab == 'codigos' %}active{% endif %}" onclick="mostrarCodigos()">Busca por códigos (BETA)</button>
+        </div>
+
+        <!-- Formulário por Palavra -->
+        <form id="form-palavras" method="POST" action="{{ url_for('ncm.buscar_palavraChave') }}" {% if active_tab == 'codigos' %}style="display: none;"{% endif %}>
+            <div id="bloco-palavras" class="ncm-content fade">
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <p class="subtitulo">Selecione a(s) categoria(s) que deverão ser buscadas.</p>
+                    <button type="button" class="dropdown-btn">Selecione a(s) categoria(s) <span>▼</span></button>
+                    <div class="dropdown-content">
+                        {% for categoria in categorias.keys() %}
+                            <label>
+                                <input type="checkbox" name="categorias" value="{{ categoria }}"> <p>{{ categoria }}</p>
+                            </label>
+                        {% endfor %}
+                        <button type="button" class="dropdown-ok">OK</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="keywords">Palavras-chave</label>
+                    <p class="subtitulo">Palavras separadas com espaço. Exemplo: <strong>case fixo</strong></p>
+                    <input type="text" id="keywords" name="keywords" value="{{ request.form.keywords if request.form.keywords }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="exclude">Não deve conter</label>
+                    <p class="subtitulo">Palavras separadas com espaço. Exemplo: <strong>metal branco</strong></p>
+                    <input type="text" id="exclude" name="exclude" value="{{ request.form.exclude if request.form.exclude }}">
+                </div>                
+                <div class="send">
+                    <input type="submit" value="Buscar">
+                </div>
+            </div>
+        </form>
+
+        <!-- Formulário por Código -->
+        <form id="form-codigos" method="POST" action="{{ url_for('ncm.buscar_codigos') }}" {% if active_tab != 'codigos' %}style="display: none;"{% endif %}>
+            <div id="bloco-codigos" class="ncm-content fade">
+                <div class="form-group">
+                    <div class="alert-box">
+                        <p>⚠️ <strong>ATENÇÃO</strong> este programa não está otimizado e IRÁ retornar valores duplicados ⚠️</p>
+                    </div>
+                    <p class="subtitulo">Cole os códigos, um por linha.</p>
+                    <textarea name="codigos" rows="10" placeholder="1233345&#10;1234566&#10;1278788">{% if request.form.codigos %}{{ request.form.codigos }}{% endif %}</textarea>
+                </div>
+                <div class="send">
+                    <input type="submit" name="action" value="Buscar">
+                    {% if resultados_codigos %}
+                    <textarea name="codigos_para_exportar" style="display: none;">{{ resultados_codigos | tojson }}</textarea>
+                    <input type="submit" name="action" value="Exportar para Excel" style="margin-left: 10px; width: 150px;">
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+
+        {% if resultados %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Categoria</th>
+                    <th>Código Projeto</th>
+                    <th>NCM</th>
+                    <th>Destaque</th>
+                    <th>Descrição</th>
+                    <th>Item Controlado</th>
+                    <th>Comentário</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resultado in resultados %}
+                <tr>
+                    {% for dado in resultado %}
+                    <td>{{ dado }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="height: 100px;"></div>
+        {% endif %}
+        
+        {% if resultados_codigos %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>NCM</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resultado in resultados_codigos %}
+                <tr>
+                    <td>{{ resultado[0] }}</td>
+                    <td>{{ resultado[1] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="height: 100px;"></div>
+        {% endif %}
+
+        {% if erro_message %}
+        <div class="error-box">
+            <span>{{ erro_message }}</span>
+            <button onclick="this.parentElement.style.display='none';">X</button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+{% block spacer %}{% endblock %}
+{% block scripts %}
+<script>
+    // Funções para controlar as abas
+    function mostrarPalavras() {
+        document.getElementById('form-palavras').style.display = 'block';
+        document.getElementById('form-codigos').style.display = 'none';
+        document.getElementById('btnPalavras').classList.add('active');
+        document.getElementById('btnCodigos').classList.remove('active');
+    }
+
+    function mostrarCodigos() {
+        document.getElementById('form-palavras').style.display = 'none';
+        document.getElementById('form-codigos').style.display = 'block';
+        document.getElementById('btnCodigos').classList.add('active');
+        document.getElementById('btnPalavras').classList.remove('active');
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Variável vinda do backend via Jinja2
+        const activeTab = "{{ active_tab }}";
+
+        if (activeTab === 'codigos') {
+            mostrarCodigos();
+        } else {
+            mostrarPalavras();
+        }
+
+        // Configuração do dropdown
+        const dropdownBtn = document.querySelector(".dropdown-btn");
+        const dropdownContent = document.querySelector(".dropdown-content");
+        const okButton = document.querySelector(".dropdown-ok");
+
+        if (dropdownBtn && dropdownContent && okButton) {
+            dropdownBtn.addEventListener("click", function() {
+                dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
+            });
+
+            okButton.addEventListener("click", function() {
+                dropdownContent.style.display = "none";
+                const checkboxes = document.querySelectorAll(".dropdown-content input[type='checkbox']");
+                let selected = [];
+                checkboxes.forEach(cb => {
+                    if (cb.checked) selected.push(cb.value);
+                });
+                dropdownBtn.textContent = selected.length > 0 ? selected.join(", ") : "Selecione as categorias";
+            });
+
+            document.addEventListener("click", function(event) {
+                if (!dropdownBtn.contains(event.target) && !dropdownContent.contains(event.target)) {
+                    dropdownContent.style.display = "none";
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
